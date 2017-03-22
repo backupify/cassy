@@ -13,6 +13,9 @@ authenticator:
 
   
 enable_single_sign_out: true
+domain_list:
+  test:
+    - http://app.test
 service_list:
   test:
     - http://my.app.test
