@@ -162,18 +162,19 @@ module Cassy
     def detect_ticketing_service(service)
       # try to find the service in the valid_services list
       # if loosely_matched_services is true, try to match the base url of the service to one in the valid_services list
-      # if match_on_top_level_domain is true, ensure the base url of the service belongs to an allowed top level domain
+      # if match_on_service_domain is true, ensure the base url of the service belongs to an allowed domain
       # if still no luck, check if there is a default_redirect_url that we can use
       @service ||= service
-      is_valid_service_domain = valid_domains.detect{|tld| validate_top_level_domain(tld, @service)}
+      is_valid_service_domain = valid_domains.detect{|tld| validate_service_domain(tld, @service)}
       @ticketing_service||= valid_services.detect{|s| s == @service } ||
         (settings[:loosely_match_services] == true && valid_services.detect{|s| base_service_url(s) == base_service_url(@service)})
-        (settings[:match_on_top_level_domain] == true && is_valid_service_domain)
+        (settings[:match_on_service_domain] == true && is_valid_service_domain)
       if !@ticketing_service && settings[:default_redirect_url]
         @default_redirect_url||= settings[:default_redirect_url][Rails.env]
         @ticketing_service = @default_redirect_url
         if !is_valid_service_domain
           # make sure you replace the @service attribute to prevent fishing attacks
+          # unless we know that the requested service belongs to a known domain.
           @service = @ticketing_service
         end
       end
@@ -251,7 +252,7 @@ module Cassy
 
     private
 
-    def validate_top_level_domain(tld, service)
+    def validate_service_domain(tld, service)
       allowed_domain = URI(tld)
       # use the base_service_url to prevent phishing attacks
       base_url = base_service_url(service)
