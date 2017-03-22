@@ -35,6 +35,10 @@ module Cassy
       @valid_services || settings[:service_list][Rails.env]
     end
 
+    def valid_domains
+      @valid_domains || settings[:domain_list][Rails.env]
+    end
+
     def generate_proxy_ticket(target_service, pgt)
       # 3.2 (proxy ticket)
       pt = ProxyTicket.new
@@ -158,14 +162,20 @@ module Cassy
     def detect_ticketing_service(service)
       # try to find the service in the valid_services list
       # if loosely_matched_services is true, try to match the base url of the service to one in the valid_services list
+      # if match_on_top_level_domain is true, ensure the base url of the service belongs to an allowed top level domain
       # if still no luck, check if there is a default_redirect_url that we can use
       @service ||= service
+      is_valid_service_domain = valid_domains.detect{|tld| validate_top_level_domain(tld, @service)}
       @ticketing_service||= valid_services.detect{|s| s == @service } ||
         (settings[:loosely_match_services] == true && valid_services.detect{|s| base_service_url(s) == base_service_url(@service)})
+        (settings[:match_on_top_level_domain] == true && is_valid_service_domain)
       if !@ticketing_service && settings[:default_redirect_url]
         @default_redirect_url||= settings[:default_redirect_url][Rails.env]
-        # make sure you replace the @service attribute to prevent fishing attacks
-        @service = @ticketing_service = @default_redirect_url
+        @ticketing_service = @default_redirect_url
+        if !is_valid_service_domain
+          # make sure you replace the @service attribute to prevent fishing attacks
+          @service = @ticketing_service
+        end
       end
       @username||= params[:username].try(:strip)
       @password||= params[:password]
@@ -237,6 +247,15 @@ module Cassy
         @authenticator.configure(auth_settings)
       end
       @authenticator
+    end
+
+    private
+
+    def validate_top_level_domain(tld, service)
+      allowed_domain = URI(tld)
+      # use the base_service_url to prevent phishing attacks
+      base_url = base_service_url(service)
+      base_url && base_url.starts_with?(allowed_domain.scheme) && base_url.end_with?(allowed_domain.host)
     end
 
   end
