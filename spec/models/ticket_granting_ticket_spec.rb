@@ -53,7 +53,7 @@ describe Cassy::TicketGrantingTicket do
       
       it "returns any ticket_granting_tickets that were created after the one stored in the session" do
         @second_ticket_granting_ticket = Cassy::TicketGrantingTicket.generate("1", nil, "127.0.0.1")
-        @ticket_granting_ticket.not_the_latest_for_this_user?.should be_true
+        @ticket_granting_ticket.not_the_latest_for_this_user?.should be true
       end
       
       it "should send a request to terminate the old session" do
