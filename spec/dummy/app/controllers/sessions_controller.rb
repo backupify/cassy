@@ -6,6 +6,6 @@ class SessionsController < Cassy::SessionsController
   end
   
   def create
-    render :text => "You have logged into Dummy."
+    render :body => "You have logged into Dummy."
   end
 end
