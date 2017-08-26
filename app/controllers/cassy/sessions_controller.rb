@@ -1,5 +1,4 @@
 module Cassy
-  require 'pry'
   class SessionsController < ApplicationController
     include Cassy::Utils
     include Cassy::CAS

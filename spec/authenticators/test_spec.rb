@@ -46,7 +46,8 @@ describe Cassy::Authenticators::Test do
       click_button 'Login'
 
       page.should have_content("Incorrect username or password")
-      page.should have_xpath('//input[@id="service"]', :value => @target_service)
+      expected_xpath = find('//input[@id="service"]', :visible => false).value
+      expect(@target_service).to eq(expected_xpath)
     end
 
     it "is not vunerable to Cross Site Scripting" do

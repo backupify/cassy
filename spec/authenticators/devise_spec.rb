@@ -71,7 +71,8 @@ describe Cassy::Authenticators::Devise do
       click_button 'Login'
 
       page.should have_content("Incorrect username or password")
-      page.should have_xpath('//input[@id="service"]', :value => @target_service)
+      xpath_value = find("//input[@id='service']", :visible => false).value
+      expect(@target_service).to eq(xpath_value)
     end
 
     it "allows a user to be disabled using the standard Devise :active_for_authentication? method" do
@@ -86,7 +87,8 @@ describe Cassy::Authenticators::Devise do
       click_button 'Login'
 
       page.should have_content("Incorrect username or password")
-      page.should have_xpath('//input[@id="service"]', :value => @target_service)
+      xpath_value = find(:xpath, '//input[@id="service"]', :visible => false).value
+      expect(@target_service).to eq(xpath_value)
     end
 
     it "is not vunerable to Cross Site Scripting" do

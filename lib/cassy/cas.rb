@@ -18,7 +18,7 @@ module Cassy
       lt = Cassy::LoginTicket.new
       lt.ticket = "LT-" + Cassy::Utils.random_string
 
-      lt.client_hostname =request.env['HTTP_X_FORWARDED_FOR'] ||request.env['REMOTE_HOST'] ||request.env['REMOTE_ADDR']
+      lt.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
       lt.save!
       logger.debug("Generated login ticket '#{lt.ticket}' for client at '#{lt.client_hostname}'")
       lt
