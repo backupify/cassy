@@ -171,7 +171,7 @@ DEPENDENCIES
   capybara
   cassy!
   database_cleaner
-  devise
+  devise (~> 4.0)
   launchy
   rails (= 5.1.0)
   rspec-rails (~> 3.6.0)

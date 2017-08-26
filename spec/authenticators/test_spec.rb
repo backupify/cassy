@@ -100,7 +100,7 @@ describe Cassy::Authenticators::Test do
     end
     
     it "fails to log in when neither the user and ticketed_user are set" do
-      Cassy::Authenticators::Test.stub!(:find_user).and_return(nil)
+      Cassy::Authenticators::Test.stub(:find_user).and_return(nil)
       visit "/cas/login?service="+CGI.escape(@target_service)
       fill_in 'username', :with => "something"
       fill_in 'password', :with => INVALID_PASSWORD
