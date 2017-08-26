@@ -9,3 +9,5 @@ end
 gem 'rails', railsversion
 gemspec
 
+gem 'devise', github: 'plataformatec/devise'
+
