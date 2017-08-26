@@ -173,13 +173,13 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  capybara
+  capybara (~> 2.15.1)
   cassy!
   database_cleaner
   devise!
   launchy
-  rails (= 5.1.0)
-  rspec-rails
+  rails (~> 5.1, = 5.1.0)
+  rspec-rails (~> 3.6.1)
   sqlite3
   webmock
 

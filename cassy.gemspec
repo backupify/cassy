@@ -11,8 +11,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'crypt-isaac', '~> 0.9.1'
   s.add_dependency 'rails', '= 5.1.0'
 
-  s.add_development_dependency 'rspec-rails'
-  s.add_development_dependency 'capybara'
+  s.add_development_dependency 'rspec-rails', '~> 3.6.1'
+  s.add_development_dependency 'capybara', '~> 2.15.1'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'launchy'
