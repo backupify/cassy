@@ -18,4 +18,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'launchy'
   s.add_development_dependency 'devise', '~> 4.3.0'
   s.add_development_dependency 'webmock'
+  s.add_development_dependency 'rails-controller-testing'
 end

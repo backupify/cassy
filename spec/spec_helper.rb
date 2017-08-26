@@ -17,3 +17,7 @@ VALID_PASSWORD = 'spec_password'
 
 ATTACK_USERNAME = '%3E%22%27%3E%3Cscript%3Ealert%2826%29%3C%2Fscript%3E&password=%3E%22%27%3E%3Cscript%3Ealert%2826%29%3C%2Fscript%3E&lt=%3E%22%27%3E%3Cscript%3Ealert%2826%29%3C%2Fscript%3E&service=%3E%22%27%3E%3Cscript%3Ealert%2826%29%3C%2Fscript%3E'
 INVALID_PASSWORD = 'invalid_password'
+
+class ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+end

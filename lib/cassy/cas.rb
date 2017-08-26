@@ -18,7 +18,7 @@ module Cassy
       lt = Cassy::LoginTicket.new
       lt.ticket = "LT-" + Cassy::Utils.random_string
 
-      lt.client_hostname = env['HTTP_X_FORWARDED_FOR'] || env['REMOTE_HOST'] || env['REMOTE_ADDR']
+      lt.client_hostname =request.env['HTTP_X_FORWARDED_FOR'] ||request.env['REMOTE_HOST'] ||request.env['REMOTE_ADDR']
       lt.save!
       logger.debug("Generated login ticket '#{lt.ticket}' for client at '#{lt.client_hostname}'")
       lt
@@ -47,7 +47,7 @@ module Cassy
       pt.username = pgt.service_ticket.username
       pt.granted_by_pgt_id = pgt.id
       pt.granted_by_tgt_id = pgt.service_ticket.granted_by_tgt.id
-      pt.client_hostname = @env['HTTP_X_FORWARDED_FOR'] || @env['REMOTE_HOST'] || @env['REMOTE_ADDR']
+      pt.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
       pt.save!
       logger.debug("Generated proxy ticket '#{pt.ticket}' for target service '#{pt.service}'" +
         " for user '#{pt.username}' at '#{pt.client_hostname}' using proxy-granting" +
@@ -75,7 +75,7 @@ module Cassy
         pgt.ticket = "PGT-" + Cassy::Utils.random_string(60)
         pgt.iou = "PGTIOU-" + Cassy::Utils.random_string(57)
         pgt.service_ticket_id = st.id
-        pgt.client_hostname = @env['HTTP_X_FORWARDED_FOR'] || @env['REMOTE_HOST'] || @env['REMOTE_ADDR']
+        pgt.client_hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
 
         # FIXME: The CAS protocol spec says to use 'pgt' as the parameter, but in practice
         #         the JA-SIG and Yale server implementations use pgtId. We'll go with the
@@ -213,7 +213,7 @@ module Cassy
       credentials = { :username => @username,
                       :password => @password,
                       :service  => @service,
-                      :request  => env
+                      :request  => request.env
                     }
       @user = authenticator.find_user(credentials) || authenticator.find_user_from_ticket(@tgt)
       valid = ((@user == @ticketed_user) || authenticator.validate(credentials)) && !!@user

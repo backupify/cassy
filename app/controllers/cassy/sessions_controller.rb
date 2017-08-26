@@ -1,14 +1,14 @@
 module Cassy
+  require 'pry'
   class SessionsController < ApplicationController
     include Cassy::Utils
     include Cassy::CAS
 
     def new
       detect_ticketing_service(params[:service])
-
       @renew = params['renew']
       @gateway = params['gateway'] == 'true' || params['gateway'] == '1'
-      @hostname = env['HTTP_X_FORWARDED_FOR'] || env['REMOTE_HOST'] || env['REMOTE_ADDR']
+      @hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
       @tgt, tgt_error = Cassy::TicketGrantingTicket.validate(request.cookies['tgt'])
       if @tgt
         flash.now[:notice] = "You are currently logged in as '%s'." % ticketed_user(@tgt).send(settings[:username_field])
@@ -40,7 +40,7 @@ module Cassy
     def create
       @lt = generate_login_ticket.ticket # in case the login isn't successful, another ticket needs to be generated for the next attempt at login
       detect_ticketing_service(params[:service])
-      @hostname = env['HTTP_X_FORWARDED_FOR'] || env['REMOTE_HOST'] || env['REMOTE_ADDR']
+      @hostname = request.env['HTTP_X_FORWARDED_FOR'] || request.env['REMOTE_HOST'] || request.env['REMOTE_ADDR']
       consume_ticket = Cassy::LoginTicket.validate(@lt)
       if !consume_ticket[:valid]
         flash.now[:error] = consume_ticket[:error]
