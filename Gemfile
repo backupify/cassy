@@ -3,9 +3,10 @@ source "http://rubygems.org"
 if ENV.key?('RAILS_VERSION')
     railsversion = "= #{ENV['RAILS_VERSION']}"
 else
-    railsversion = ['>= 3.1.10']
+    railsversion = ['= 5.1.0']
 end
 
-gem 'rails', railsversion
+gem 'rails', "~> 5.1", railsversion
 gemspec
 
+gem 'devise', github: 'plataformatec/devise'
