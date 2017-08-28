@@ -16,7 +16,7 @@ describe Cassy::Authenticators::Test do
       fill_in 'username', :with => VALID_USERNAME
       fill_in 'Password', :with => VALID_PASSWORD
       click_button 'Login'
-      page.should have_content("You have successfully logged in")
+      expect(page).to have_content("You have successfully logged in")
     end
 
     it "fails to log in with invalid password" do
@@ -25,7 +25,7 @@ describe Cassy::Authenticators::Test do
       fill_in 'Password', :with => INVALID_PASSWORD
       click_button 'Login'
 
-      page.should have_content("Incorrect username or password")
+      expect(page).to have_content("Incorrect username or password")
     end
 
     it "logs in successfully with valid username and password and redirects to target service" do
@@ -35,7 +35,7 @@ describe Cassy::Authenticators::Test do
 
       click_button 'Login'
 
-      page.current_url.should =~ /^#{Regexp.escape(@target_service)}\/?\?ticket=ST\-[1-9rA-Z]+/
+      expect(page.current_url).to match(/^#{Regexp.escape(@target_service)}\/?\?ticket=ST\-[1-9rA-Z]+/)
     end
 
     it "preserves target service after invalid login" do
@@ -45,26 +45,26 @@ describe Cassy::Authenticators::Test do
       fill_in 'password', :with => INVALID_PASSWORD
       click_button 'Login'
 
-      page.should have_content("Incorrect username or password")
+      expect(page).to have_content("Incorrect username or password")
       expected_xpath = find('//input[@id="service"]', :visible => false).value
       expect(@target_service).to eq(expected_xpath)
     end
 
     it "is not vunerable to Cross Site Scripting" do
       visit '/cas/login?service=%22%2F%3E%3cscript%3ealert%2832%29%3c%2fscript%3e'
-      page.should_not have_content("alert(32)")
-      page.should_not have_xpath("//script")
-      #page.should have_xpath("<script>alert(32)</script>")We
+      expect(page).not_to have_content("alert(32)")
+      expect(page).not_to have_xpath("//script")
+      #expect(page).to have_xpath("<script>alert(32)</script>")We
     end
-    
+
     it "logs in successfully with valid username and password and an invalid target service" do
       visit "/cas/login?service="+CGI.escape(@invalid_target_service)
       fill_in 'username', :with => VALID_USERNAME
       fill_in 'password', :with => VALID_PASSWORD
       click_button 'Login'
-      page.should have_content("You have successfully logged in")
+      expect(page).to have_content("You have successfully logged in")
     end
-    
+
     it "is able to loosely match service urls with the option set in cassy.yml" do
       # eg we log in and try to go to http://my.app.test/something_else 
       # and should be able to validate the ticket from http://my.app.test/users/service
@@ -73,9 +73,9 @@ describe Cassy::Authenticators::Test do
       fill_in 'username', :with => VALID_USERNAME
       fill_in 'password', :with => VALID_PASSWORD
       click_button 'Login'
-      page.should have_content("Hey you made it to the page of extra content")
+      expect(page).to have_content("Hey you made it to the page of extra content")
     end
-    
+
     it "doesn't loosely match service urls if the option isn't set in cassy.yml" do
       # eg we log in and try to go to http://my.app.test/something_else 
       # and should be able to validate the ticket from http://my.app.test/users/service
@@ -86,9 +86,9 @@ describe Cassy::Authenticators::Test do
       fill_in 'username', :with => VALID_USERNAME
       fill_in 'password', :with => VALID_PASSWORD
       click_button 'Login'
-      page.should_not have_content("Hey you made it to the page of extra content")
+      expect(page).not_to have_content("Hey you made it to the page of extra content")
     end
-    
+
     it "redirects to the default redirect page when the new login page is loaded after already logging in" do
       Cassy::Engine.config.configuration[:loosely_match_services] = true
       visit "/cas/login?service="+CGI.escape(@target_service+"/another_page")
@@ -97,16 +97,16 @@ describe Cassy::Authenticators::Test do
       click_button 'Login'
       # hey that login page was cool, i want to see it again!
       visit "/cas/login"
-      page.should have_content("You are currently logged in as 'Users Username'.")
+      expect(page).to have_content("You are currently logged in as 'Users Username'.")
     end
-    
+
     it "fails to log in when neither the user and ticketed_user are set" do
-      Cassy::Authenticators::Test.stub(:find_user).and_return(nil)
+      allow(Cassy::Authenticators::Test).to receive(:find_user).and_return(nil)
       visit "/cas/login?service="+CGI.escape(@target_service)
       fill_in 'username', :with => "something"
       fill_in 'password', :with => INVALID_PASSWORD
       click_button 'Login'
-      page.should have_content("Incorrect username or password")
+      expect(page).to have_content("Incorrect username or password")
     end
 
   end
@@ -117,13 +117,13 @@ describe Cassy::Authenticators::Test do
     it "logs out successfully" do
       visit "/cas/logout"
 
-      page.should have_content("You have successfully logged out")
+      expect(page).to have_content("You have successfully logged out")
     end
 
     it "logs out successfully and redirects to target service" do
       visit "/cas/logout?gateway=true&service="+CGI.escape(@target_service)
 
-      page.current_url.should =~ /^#{Regexp.escape(@target_service)}\/?/
+      expect(page.current_url).to match(/^#{Regexp.escape(@target_service)}\/?/)
     end
 
   end # describe '/logout'
@@ -138,15 +138,15 @@ describe Cassy::Authenticators::Test do
 
       click_button 'Login'
 
-      page.current_url.should =~ /^#{Regexp.escape(@target_service)}\/?\?ticket=ST\-[1-9rA-Z]+/
+      expect(page.current_url).to match(/^#{Regexp.escape(@target_service)}\/?\?ticket=ST\-[1-9rA-Z]+/)
       @ticket = page.current_url.match(/ticket=(.*)$/)[1]
     end
 
     it "should have extra attributes in proper format" do
       Cassy::Engine.config.configuration[:extra_attributes] = [{ :user => :full_name }]
       visit "/cas/serviceValidate?service=#{CGI.escape(@target_service)}&ticket=#{@ticket}"
-      
-      page.body.should match("<full_name>Example User</full_name>")
+
+      expect(page.body).to match("<full_name>Example User</full_name>")
     end
   end
 
@@ -160,15 +160,15 @@ describe Cassy::Authenticators::Test do
 
       click_button 'Login'
 
-      page.current_url.should =~ /^#{Regexp.escape(@target_service)}\/?\?ticket=ST\-[1-9rA-Z]+/
+      expect(page.current_url).to match(/^#{Regexp.escape(@target_service)}\/?\?ticket=ST\-[1-9rA-Z]+/)
       @ticket = page.current_url.match(/ticket=(.*)$/)[1]
     end
 
     it "should have extra attributes in proper format" do
       Cassy::Engine.config.configuration[:extra_attributes] = [{ :user => :full_name }]
       visit "/cas/proxyValidate?service=#{CGI.escape(@target_service)}&ticket=#{@ticket}"
-      
-      page.body.should match("<full_name>Example User</full_name>")
+
+      expect(page.body).to match("<full_name>Example User</full_name>")
     end
   end
 
