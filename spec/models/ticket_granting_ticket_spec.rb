@@ -7,17 +7,17 @@ describe Cassy::TicketGrantingTicket do
   end
 
   it "should validate" do
-    Cassy::TicketGrantingTicket.validate("TGT-12345678900987654321").should == [@ticket_granting_ticket, "Ticket granting ticket 'TGT-12345678900987654321' for user '1' successfully validated."]    
+    expect(Cassy::TicketGrantingTicket.validate("TGT-12345678900987654321")).to eq([@ticket_granting_ticket, "Ticket granting ticket 'TGT-12345678900987654321' for user '1' successfully validated."]    )
   end
 
   it "should not validate if the ticket is too old" do
     @ticket_granting_ticket.created_on = Time.now-7201
     @ticket_granting_ticket.save!
-    Cassy::TicketGrantingTicket.validate("TGT-12345678900987654321").should == [nil, "Ticket TGT-12345678901234567890 has expired. Please log in again."]
+    expect(Cassy::TicketGrantingTicket.validate("TGT-12345678900987654321")).to eq([nil, "Ticket TGT-12345678901234567890 has expired. Please log in again."])
   end
 
   it "should not validate if the ticket is invalid" do
-    Cassy::TicketGrantingTicket.validate("TGT-09876543210987654321").should == [nil, "Ticket 'TGT-09876543210987654321' not recognized."]
+    expect(Cassy::TicketGrantingTicket.validate("TGT-09876543210987654321")).to eq([nil, "Ticket 'TGT-09876543210987654321' not recognized."])
   end
 
   context "single sign out" do
@@ -50,7 +50,7 @@ describe Cassy::TicketGrantingTicket do
 
       it "returns any ticket_granting_tickets that were created after the one stored in the session" do
         @second_ticket_granting_ticket = Cassy::TicketGrantingTicket.generate("1", nil, "127.0.0.1")
-        @ticket_granting_ticket.not_the_latest_for_this_user?.should be true
+        expect(@ticket_granting_ticket.not_the_latest_for_this_user?).to be true
       end
 
       it "should send a request to terminate the old session" do
@@ -70,14 +70,14 @@ describe Cassy::TicketGrantingTicket do
       it "should have two sessions" do
         expect_any_instance_of(Cassy::TicketGrantingTicket).not_to receive(:destroy_and_logout_all_service_tickets)
         @second_ticket_granting_ticket = Cassy::TicketGrantingTicket.generate("1", nil, "127.0.0.1")
-        Cassy::TicketGrantingTicket.where(:username => "1").count.should == 2
+        expect(Cassy::TicketGrantingTicket.where(:username => "1").count).to eq(2)
       end
     end
 
     it "returns the previous ticket for the username" do
       Cassy.config[:enable_single_sign_out] = true # otherwise they will be deleted
       @second_ticket_granting_ticket = Cassy::TicketGrantingTicket.generate("1", nil, "127.0.0.1")
-      @second_ticket_granting_ticket.previous_ticket.should == @ticket_granting_ticket
+      expect(@second_ticket_granting_ticket.previous_ticket).to eq(@ticket_granting_ticket)
     end
   end
 end
