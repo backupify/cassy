@@ -7,3 +7,4 @@ spec/dummy/tmp/
 spec/dummy/log
 .*.sw[po]
 *.DS_Store
+!.ruby-version
